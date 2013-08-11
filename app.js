@@ -22,10 +22,12 @@ io.set('log level', 1);
 /*
  Also use Redis for Session Store. Redis will keep all Express sessions in it.
  */
+var redis_url = 'pub-redis-14176.us-east-1-3.1.ec2.garantiadata.com';
+var redis_port = 14176;
 var RedisStore = require('connect-redis')(express),
-    rClient = redis.createClient(),
+    rClient = redis.createClient(redis_port, redis_url, {auth_pass: 'hJIIS307Lm9DctnO'}),
     sessionStore = new RedisStore({client:rClient});
-
+    rClient.auth('hJIIS307Lm9DctnO');
 //var MemoryStore = express.session.MemoryStore;
 //
 //var sessionStore = new MemoryStore();
@@ -87,8 +89,11 @@ var sessionSockets = new SessionSockets(io, sessionStore, cookieParser, 'jsessio
  Create two redis connections. A 'pub' for publishing and a 'sub' for subscribing.
  Subscribe 'sub' connection to 'chat' channel.
  */
-var sub = redis.createClient();
-var pub = redis.createClient();
+var sub = redis.createClient(redis_port, redis_url, {auth_pass: 'hJIIS307Lm9DctnO'});
+var pub = redis.createClient(redis_port, redis_url, {auth_pass: 'hJIIS307Lm9DctnO'});
+
+sub.auth('hJIIS307Lm9DctnO');
+pub.auth('hJIIS307Lm9DctnO');
 sub.subscribe('chat');
 
 sessionSockets.on('connection', function (err, socket, session) {
